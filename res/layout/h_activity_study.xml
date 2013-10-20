@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"> 
+    <LinearLayout       
+      android:layout_width= "match_parent"
+      android:layout_height="match_parent"      
+      android:layout_weight = "1"
+        android:layout_marginTop="40px"
+        android:layout_marginBottom="40px"
+        android:layout_marginLeft="40px"
+        android:layout_marginRight="40px" 
+      
+      android:orientation="vertical" >
+    
+    <TextView
+        android:id="@+id/hanzi" 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"        
+        android:layout_weight = "1"
+        android:layout_marginTop="10pt"
+        android:layout_marginBottom="10pt"
+        android:layout_marginLeft="10pt"
+        android:layout_marginRight="10pt"
+        android:gravity="center"
+        android:textSize="300px"
+        android:text="道"        
+        />
+    <TextView
+        android:id="@+id/pinyin" 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"        
+        android:layout_weight = "2"
+        android:layout_marginTop="40px"
+        android:layout_marginBottom="40px"
+        android:layout_marginLeft="40px"
+        android:layout_marginRight="40px"
+        android:gravity="center"
+        android:textSize="100px"
+    />
+    </LinearLayout>
+    
+    <LinearLayout       
+      android:layout_width= "match_parent"
+      android:layout_height="match_parent"      
+      android:layout_weight = "2"
+        android:layout_marginTop="40px"
+        android:layout_marginBottom="40px"
+        android:layout_marginLeft="40px"
+        android:layout_marginRight="40px" 
+      
+      android:orientation="horizontal" >
+    
+      <Button
+        android:id="@+id/KnownBtn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.01"
+        android:text="I know it" />
+    
+      <Button
+        android:id="@+id/UnknownBtn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.01"
+        android:text="It is new to me" />    
+     </LinearLayout>
+</LinearLayout>
