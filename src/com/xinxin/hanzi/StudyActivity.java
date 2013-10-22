@@ -46,6 +46,7 @@ import android.content.SharedPreferences;
 
 public class StudyActivity extends Activity {
 
+	private boolean isJustCreated = true;
 	private int index = 0;
 	private SharedPreferences prefs;
 	private static final String prefFileName = "fPref";
@@ -57,8 +58,7 @@ public class StudyActivity extends Activity {
     	@Override
     	public void onServiceConnected(ComponentName className, IBinder iservice)
     	{
-    		ttsService = ITts.Stub.asInterface(iservice);
-    		ttsBound = true;
+    		ttsService = ITts.Stub.asInterface(iservice);    		
     		try
     		{
     			ttsService.initialize();
@@ -67,6 +67,10 @@ public class StudyActivity extends Activity {
     		{
     			
     		}
+    		ttsBound = true;
+    		
+    		TTSInitialized();
+    		
     	}
     	@Override
     	public void onServiceDisconnected(ComponentName arg0)
@@ -80,17 +84,19 @@ public class StudyActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		prefs = getSharedPreferences(prefFileName, MODE_PRIVATE);
-		index = prefs.getInt(prefParamName, 0);
-		//setContentView(R.layout.activity_main);
-		   if (!ttsBound)
-		   {
+
+		if (!ttsBound)
+		{
 			   String actionName = "com.shoushuo.android.tts.intent.action.InvokeTts";
 			   Intent intent = new Intent(actionName);
 			   this.bindService(intent, connection, Context.BIND_AUTO_CREATE);
-			   ttsBound = true;
-		   }
+	    }
+		
+		
+		prefs = getSharedPreferences(prefFileName, MODE_PRIVATE);
+		index = prefs.getInt(prefParamName, 0);
+		isJustCreated = prefs.getBoolean("Justcreated", true);
+		//setContentView(R.layout.activity_main);
 
 		   
 		WindowManager wm = getWindowManager();
@@ -104,6 +110,18 @@ public class StudyActivity extends Activity {
 		Button btnStudy = (Button)findViewById(R.id.KnownBtn);
 		btnStudy.setOnClickListener( lst );
 	}
+	protected void TTSInitialized() {
+		// TODO Auto-generated method stub
+		if (isJustCreated)
+		 showCurrContent();
+		isJustCreated = false;
+	}
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		showCurrContent();
+	}
 
 	@Override
 	public void onDestroy()
@@ -111,12 +129,14 @@ public class StudyActivity extends Activity {
 		if (ttsBound)
 		{
 			this.unbindService(connection);
-			ttsBound = false;
+		//	ttsBound = false;
 		}
 	
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(prefParamName, index);
+		editor.putBoolean("Justcreated", isJustCreated);
 		editor.commit();
+		
 		super.onDestroy();
 	}
 
@@ -138,13 +158,13 @@ public class StudyActivity extends Activity {
 	private void showLandscape()
 	{
 		setContentView(R.layout.v_activity_study);
-		showCurrContent();
+		//showCurrContent();
 	}
 	
 	private void showPortrait()
 	{
 		setContentView(R.layout.h_activity_study);
-		showCurrContent();
+		//showCurrContent();
 	}
 	
 	private void showNextContent()
@@ -166,13 +186,16 @@ public class StudyActivity extends Activity {
 	}
 	
 	private void showShenYin(char ch) {
-		// TODO Auto-generated method stub
+		// TODO Auto-generted method stub
+		if (ttsBound)
+		{
 		String toShow = String.format("%c", ch);
 		try {
 			ttsService.speak(toShow, TextToSpeech.QUEUE_ADD);
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
 		}
 	}
 
