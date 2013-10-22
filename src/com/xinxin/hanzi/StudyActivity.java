@@ -1,6 +1,7 @@
 package com.xinxin.hanzi;
 
 
+import com.shoushuo.android.tts.ITts;
 import com.xinxin.data.Data;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -11,8 +12,14 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
 
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.speech.tts.TextToSpeech;
 import android.view.Display;
 import android.view.Menu;
 import android.view.Surface;
@@ -43,6 +50,32 @@ public class StudyActivity extends Activity {
 	private SharedPreferences prefs;
 	private static final String prefFileName = "fPref";
 	private static final String prefParamName = "Index";
+    private ITts ttsService;
+    private boolean ttsBound;
+    private ServiceConnection connection = new ServiceConnection()
+    {
+    	@Override
+    	public void onServiceConnected(ComponentName className, IBinder iservice)
+    	{
+    		ttsService = ITts.Stub.asInterface(iservice);
+    		ttsBound = true;
+    		try
+    		{
+    			ttsService.initialize();
+    		}
+    		catch(RemoteException e)
+    		{
+    			
+    		}
+    	}
+    	@Override
+    	public void onServiceDisconnected(ComponentName arg0)
+    	{
+    		ttsService = null;
+    		ttsBound = false;
+    	}
+    };
+    
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +84,15 @@ public class StudyActivity extends Activity {
 		prefs = getSharedPreferences(prefFileName, MODE_PRIVATE);
 		index = prefs.getInt(prefParamName, 0);
 		//setContentView(R.layout.activity_main);
+		   if (!ttsBound)
+		   {
+			   String actionName = "com.shoushuo.android.tts.intent.action.InvokeTts";
+			   Intent intent = new Intent(actionName);
+			   this.bindService(intent, connection, Context.BIND_AUTO_CREATE);
+			   ttsBound = true;
+		   }
+
+		   
 		WindowManager wm = getWindowManager();
 		Display d = wm.getDefaultDisplay();
 		if (d.getRotation() == Surface.ROTATION_0 || 
@@ -66,6 +108,12 @@ public class StudyActivity extends Activity {
 	@Override
 	public void onDestroy()
 	{
+		if (ttsBound)
+		{
+			this.unbindService(connection);
+			ttsBound = false;
+		}
+	
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(prefParamName, index);
 		editor.commit();
@@ -114,8 +162,20 @@ public class StudyActivity extends Activity {
 		char ch = Data.getDataInst().get(index);
 		showHanzi(ch);
 		showPinyin(ch);
+		showShenYin(ch);
 	}
 	
+	private void showShenYin(char ch) {
+		// TODO Auto-generated method stub
+		String toShow = String.format("%c", ch);
+		try {
+			ttsService.speak(toShow, TextToSpeech.QUEUE_ADD);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private void showHanzi(char cStr)
 	{
 		TextView ed = ((TextView)findViewById(R.id.hanzi));
