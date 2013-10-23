@@ -2,6 +2,7 @@ package com.xinxin.hanzi;
 
 
 import com.shoushuo.android.tts.ITts;
+import com.xinxin.AndroidUtil.AndroidUtil;
 import com.xinxin.data.Data;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
@@ -87,6 +88,10 @@ public class StudyActivity extends Activity {
 
 		if (!ttsBound)
 		{
+			if ( ! AndroidUtil.getInst().isPackageInstalled(this, "com.shoushuo.android.tts") )
+			{
+				AndroidUtil.getInst().installPackage(this, "com.shoushuo.android.tts");
+			}
 			   String actionName = "com.shoushuo.android.tts.intent.action.InvokeTts";
 			   Intent intent = new Intent(actionName);
 			   this.bindService(intent, connection, Context.BIND_AUTO_CREATE);
