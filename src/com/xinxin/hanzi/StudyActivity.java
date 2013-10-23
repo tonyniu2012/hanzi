@@ -100,7 +100,7 @@ public class StudyActivity extends Activity {
 		
 		prefs = getSharedPreferences(prefFileName, MODE_PRIVATE);
 		index = prefs.getInt(prefParamName, 0);
-		isJustCreated = prefs.getBoolean("Justcreated", true);
+		
 		//setContentView(R.layout.activity_main);
 
 		   
@@ -117,9 +117,7 @@ public class StudyActivity extends Activity {
 	}
 	protected void TTSInitialized() {
 		// TODO Auto-generated method stub
-		if (isJustCreated)
 		 showCurrContent();
-		isJustCreated = false;
 	}
 	@Override
 	public void onStart()
@@ -139,7 +137,6 @@ public class StudyActivity extends Activity {
 	
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(prefParamName, index);
-		editor.putBoolean("Justcreated", isJustCreated);
 		editor.commit();
 		
 		super.onDestroy();
